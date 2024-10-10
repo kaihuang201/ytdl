@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+
+# Install pytubefix:
+#    pip install pytubefix
+
+from pytubefix import YouTube, Playlist
+from pytubefix.cli import on_progress
+import argparse
+
+PROBLEM_CHAR = '?'
+
+def DownloadPlaylist(pl_url, download_dir, audio_only=False):
+    pl = Playlist(pl_url)
+    for i, video in enumerate(pl.videos):
+        print('Downloading {} / {} in Playlist.'.format(i, len(pl.videos)))
+        video.on_progress_callback = on_progress
+        if audio_only:
+            video.streams.get_audio_only().download(download_dir, remove_problematic_character=PROBLEM_CHAR, mp3=True)
+        else:
+            video.streams.get_highest_resolution().download(download_dir, remove_problematic_character=PROBLEM_CHAR)
+
+
+def DownloadVideo(vid_url, download_dir, audio_only=False):
+    yt = YouTube(vid_url, on_progress_callback=on_progress)
+    yt.streams.get_highest_resolution().download(download_dir, remove_problematic_character=PROBLEM_CHAR)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-a', '--audio_only', help='Will download audio only and save as mp3 if specified.', action=argparse.BooleanOptionalAction)
+    parser.add_argument('urls', nargs='*')
+    parser.add_argument('-d', '--download_dir', help='Directory to save the download files.', default='youtube_download')
+    args = parser.parse_args()
+
+    print('URLs =', args.urls)
+    print('Audio Only =', args.audio_only)
+    print('Download Dir =', args.download_dir)
+
+    for url in args.urls:
+        if 'youtube.com/playlist?list=' in url:
+            DownloadPlaylist(url, args.download_dir, args.audio_only)
+        else:
+            DownloadVideo(url, args.download_dir, args.audio_only)
