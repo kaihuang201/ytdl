@@ -1,4 +1,5 @@
-#!/usr/bin/env python && /usr/bin/env python3
+#!/usr/bin/env python3
+#!/usr/bin/env python
 
 # Install pytubefix:
 #    pip install pytubefix
@@ -9,20 +10,21 @@ import argparse
 
 PROBLEM_CHAR = '?'
 
+def download_video_helper(video_obj, download_dir, audio_only=False):
+    if audio_only:
+        video_obj.streams.get_audio_only().download(download_dir, mp3=True)
+    else:
+        video_obj.streams.get_highest_resolution().download(download_dir)
+
 def DownloadPlaylist(pl_url, download_dir, audio_only=False):
     pl = Playlist(pl_url)
-    for i, video in enumerate(pl.videos):
+    for i, video_obj in enumerate(pl.videos):
         print('Downloading {} / {} in Playlist.'.format(i, len(pl.videos)))
-        video.on_progress_callback = on_progress
-        if audio_only:
-            video.streams.get_audio_only().download(download_dir, remove_problematic_character=PROBLEM_CHAR, mp3=True)
-        else:
-            video.streams.get_highest_resolution().download(download_dir, remove_problematic_character=PROBLEM_CHAR)
-
+        download_video_helper(video_obj, download_dir, audio_only)
 
 def DownloadVideo(vid_url, download_dir, audio_only=False):
-    yt = YouTube(vid_url, on_progress_callback=on_progress)
-    yt.streams.get_highest_resolution().download(download_dir, remove_problematic_character=PROBLEM_CHAR)
+    video_obj = YouTube(vid_url, on_progress_callback=on_progress)
+    download_video_helper(video_obj, download_dir, audio_only)
 
 
 if __name__ == '__main__':
