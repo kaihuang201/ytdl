@@ -1,5 +1,6 @@
-from flask import Flask, render_template_string, request, send_file, session
+from flask import Flask, render_template_string, request, send_file, session, redirect, url_for
 from datetime import datetime
+import time
 import os
 import threading
 from ytdl import DownloadURLs
@@ -7,10 +8,11 @@ from ytdl import DownloadURLs
 app = Flask(__name__)
 app.secret_key = "supersecretkey"  # Needed for session persistence
 
+directory = "./static/yt_download"
+
 download_threads = []  # Keep track of active download threads
 
 def get_files():
-    directory = "./yt_download"
     files = []
     if os.path.exists(directory):
         for filename in os.listdir(directory):
@@ -26,6 +28,7 @@ HTML_PAGE = """
 <html>
 <head>
     <title>Downloader</title>
+    <meta http-equiv="refresh" content="5">
 </head>
 <body>
     <h3>Enter Text to Download</h3>
@@ -65,15 +68,22 @@ def download():
     audio_only = request.form.get("audio_only") == "true"
     session['audio_only'] = audio_only  # Store choice in session
     
-    '''
-    thread = threading.Thread(target=DownloadURLs, args=(video_urls, audio_only))
+    thread = threading.Thread(target=DownloadURLs, args=(video_urls, directory, audio_only))
     thread.start()
     download_threads.append(thread)
-    '''
-    DownloadURLs(video_urls, audio_only)
+
+    #DownloadURLs(video_urls, directory, audio_only)
     
     return redirect(url_for('index'))
 
+def JoinThreads():
+    for t in download_threads:
+        if not t.is_active():
+            t.join()
+
+    time.sleep(5)
+
 if __name__ == "__main__":
+    threading.Thread(target=JoinThreads, args=())
     app.run(debug=False, host="0.0.0.0", port=10000)
 

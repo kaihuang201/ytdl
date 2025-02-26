@@ -32,12 +32,12 @@ def DownloadVideo(vid_url, download_dir, audio_only=False):
     video_obj = YouTube(vid_url, on_progress_callback=on_progress, use_oauth=True, allow_oauth_cache=True)
     download_video_helper(video_obj, download_dir, audio_only)
 
-def DownloadURLs(vid_or_playlist_urls, audio_only):
+def DownloadURLs(vid_or_playlist_urls, download_dir, audio_only):
     for url in vid_or_playlist_urls:
         if 'youtube.com/playlist?list=' in url:
-            DownloadPlaylist(url, DEFAULT_DOWNLOAD_DIR, audio_only)
+            DownloadPlaylist(url, download_dir, audio_only)
         else:
-            DownloadVideo(url, DEFAULT_DOWNLOAD_DIR, audio_only)
+            DownloadVideo(url, download_dir, audio_only)
 
 
 if __name__ == '__main__':
@@ -50,4 +50,4 @@ if __name__ == '__main__':
     print('URLs =', args.urls)
     print('Audio Only =', args.audio_only)
     print('Download Dir =', args.download_dir)
-    DownloadURLs(args.urls, args.audio_only);
+    DownloadURLs(args.urls, args.download_dir, args.audio_only);
