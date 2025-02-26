@@ -8,14 +8,15 @@ from pytubefix.cli import on_progress
 import argparse
 
 PROBLEM_CHAR = '?'
+DEFAULT_DOWNLOAD_DIR = 'yt_download'
 
 def download_video_helper(video_obj, download_dir, audio_only=False):
     if audio_only:
         video_obj.streams.get_audio_only().download(download_dir, mp3=True)
     else:
         streams = video_obj.streams
-        print("STREAMS::::")
-        print(streams)
+        #print("STREAMS::")
+        #print(streams)
         if streams.get_highest_resolution():
             streams.get_highest_resolution().download(download_dir)
         else:
@@ -31,20 +32,22 @@ def DownloadVideo(vid_url, download_dir, audio_only=False):
     video_obj = YouTube(vid_url, on_progress_callback=on_progress, use_oauth=True, allow_oauth_cache=True)
     download_video_helper(video_obj, download_dir, audio_only)
 
+def DownloadURLs(vid_or_playlist_urls, audio_only):
+    for url in vid_or_playlist_urls:
+        if 'youtube.com/playlist?list=' in url:
+            DownloadPlaylist(url, DEFAULT_DOWNLOAD_DIR, audio_only)
+        else:
+            DownloadVideo(url, DEFAULT_DOWNLOAD_DIR, audio_only)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-a', '--audio_only', help='Will download audio only and save as mp3 if specified.', action=argparse.BooleanOptionalAction)
     parser.add_argument('urls', nargs='*')
-    parser.add_argument('-d', '--download_dir', help='Directory to save the download files.', default='youtube_download')
+    parser.add_argument('-d', '--download_dir', help='Directory to save the download files.', default=DEFAULT_DOWNLOAD_DIR)
     args = parser.parse_args()
 
     print('URLs =', args.urls)
     print('Audio Only =', args.audio_only)
     print('Download Dir =', args.download_dir)
-
-    for url in args.urls:
-        if 'youtube.com/playlist?list=' in url:
-            DownloadPlaylist(url, args.download_dir, args.audio_only)
-        else:
-            DownloadVideo(url, args.download_dir, args.audio_only)
+    DownloadURLs(args.urls, args.audio_only);
