@@ -8,7 +8,7 @@ from pytubefix.cli import on_progress
 import argparse
 
 PROBLEM_CHAR = '?'
-DEFAULT_DOWNLOAD_DIR = 'yt_download'
+DEFAULT_DOWNLOAD_DIR = './static/yt_download'
 
 def download_video_helper(video_obj, download_dir, audio_only=False):
     if audio_only:

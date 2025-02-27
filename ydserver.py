@@ -1,5 +1,6 @@
 from flask import Flask, render_template_string, request, send_file, session, redirect, url_for
 from datetime import datetime
+import argparse
 import time
 import os
 import threading
@@ -84,6 +85,12 @@ def JoinThreads():
     time.sleep(5)
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('ip', default='0.0.0.0', nargs='?')
+    parser.add_argument('port', default=10000, nargs='?')
+    args = parser.parse_args()
+
     threading.Thread(target=JoinThreads, args=())
-    app.run(debug=False, host="0.0.0.0", port=10000)
+
+    app.run(debug=False, host=args.ip, port=args.port)
 
