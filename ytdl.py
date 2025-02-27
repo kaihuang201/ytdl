@@ -12,7 +12,7 @@ DEFAULT_DOWNLOAD_DIR = 'yt_download'
 
 def download_video_helper(video_obj, download_dir, audio_only=False):
     if audio_only:
-        video_obj.streams.get_audio_only().download(download_dir, mp3=True)
+        video_obj.streams.get_audio_only().download(download_dir)
     else:
         streams = video_obj.streams
         #print("STREAMS::")

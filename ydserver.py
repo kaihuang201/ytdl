@@ -21,19 +21,19 @@ def get_files():
                 size_mb = os.path.getsize(filepath) / (1024 * 1024)
                 creation_time = datetime.fromtimestamp(os.path.getctime(filepath)).strftime('%Y-%m-%d %H:%M:%S')
                 files.append((filename, f"{size_mb:.2f} MB", creation_time))
-    return files
+    return sorted(files, key=lambda x: x[2], reverse=True)
 
 HTML_PAGE = """
 <!DOCTYPE html>
 <html>
 <head>
     <title>Downloader</title>
-    <meta http-equiv="refresh" content="5">
 </head>
 <body>
-    <h3>Enter Text to Download</h3>
+    <h3>Enter URLs of Videos OR Playlists to Download</h3>
+    <p>One URL per line.</p>
     <form action="/download" method="post">
-        <textarea name="videourls" rows="10" cols="120"></textarea><br>
+        <textarea name="videourls" rows="10" cols="80"></textarea><br>
         <input type="checkbox" name="audio_only" value="true" {% if session.get('audio_only') %}checked{% endif %}> Audio Only<br>
         <button type="submit">Download</button>
     </form>
