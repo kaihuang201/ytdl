@@ -36,6 +36,7 @@ HTML_PAGE = """
     <form action="/download" method="post">
         <textarea name="videourls" rows="10" cols="80"></textarea><br>
         <input type="checkbox" name="audio_only" value="true" {% if session.get('audio_only') %}checked{% endif %}> Audio Only<br>
+        <input type="checkbox" name="high_res" value="true" {% if session.get('high_res') %}checked{% endif %}> High Res <br>
         <button type="submit">Download</button>
     </form>
     
@@ -67,14 +68,14 @@ def index():
 def download():
     video_urls = [line.strip() for line in request.form.get("videourls", "").split('\n')]
     audio_only = request.form.get("audio_only") == "true"
+    high_res = request.form.get("high_res") == "true"
     session['audio_only'] = audio_only  # Store choice in session
+    session['high_res'] = high_res # Store choice in session
     
-    thread = threading.Thread(target=DownloadURLs, args=(video_urls, directory, audio_only))
+    thread = threading.Thread(target=DownloadURLs, args=(video_urls, directory, audio_only, high_res))
     thread.start()
     download_threads.append(thread)
 
-    #DownloadURLs(video_urls, directory, audio_only)
-    
     return redirect(url_for('index'))
 
 def JoinThreads():
